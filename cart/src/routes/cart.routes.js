@@ -30,11 +30,11 @@ router.patch(
 
 router.delete(
   "/item/:productId",
-  createAuthMiddleware["user"],
+  createAuthMiddleware(["user"]),
   validateProductId,
   cartController.deleteProduct,
 );
 
-router.delete("/", createAuthMiddleware["user"], cartController.deleteCart);
+router.delete("/", createAuthMiddleware(["user"]), cartController.deleteCart);
 
 module.exports = router;

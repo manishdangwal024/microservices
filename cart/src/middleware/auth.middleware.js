@@ -10,7 +10,7 @@ function createAuthMiddleware(role = ["user"]) {
           message: "Unauthorized:No token provided",
         });
       }
-      const decoded = jwt.verify(token,process.env.token);
+      const decoded = jwt.verify(token,process.env.JWT_SECRET);
       if(!role.includes(decoded.role)){
         return res.status(403).json({
             message:"forbidden:insufficient permission"

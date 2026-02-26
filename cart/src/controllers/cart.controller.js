@@ -4,9 +4,9 @@ async function addItemToCart(req, res) {
   const { productId, qty } = req.body;
   const user = req.user;
 
-  let cart = await cartModel.findOne({ user: user._id });
+  let cart = await cartModel.findOne({ user: user.id });
   if (!cart) {
-    cart = new cartModel({ user: user._id, items: [] });
+    cart = new cartModel({ user: user.id, items: [] });
   }
   const existingItemIndex = cart.items.findIndex(
     (item) => item.productId.toString() === productId,
@@ -28,7 +28,7 @@ async function updateItemQuantity(req, res) {
   const { qty } = req.body;
   const user = req.user;
 
-  const cart = await cartModel.findOne({ user: user._id });
+  const cart = await cartModel.findOne({ user: user.id });
 
   if (!cart) {
     return res.staus(404).json({
@@ -53,28 +53,34 @@ async function updateItemQuantity(req, res) {
 }
 
 async function getCart(req, res) {
-  const user = req.user;
-
-  let cart = await cartModel.findOne({ user: user._id });
-
-  if (!cart) {
-    cart = new cartModel({ user: user._id, items: [] });
-    await cart.save();
+  try {
+    const user = req.user;
+  
+    let cart = await cartModel.findOne({ user: user.id });
+    if (!cart) {
+      cart = new cartModel({ user: user.id, items: [] });
+      await cart.save();
+    }
+    res.status(200).json({
+      cart,
+      total: {
+        itemCount: cart.items.length,
+        totalQunatity: cart.items.reduce((sum, item) => sum + item.quantity,0),
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message:"Internal server error",
+      error:error.message
+    })
   }
-  res.status(200).json({
-    cart,
-    total: {
-      itemCount: cart.items.length,
-      totalQunatity: cart.items.reduce((sum, item) => sum + item.quantity),
-    },
-  });
 }
 
 async function deleteProduct(req, res) {
   try {
     const { productId } = req.params;
     const user = req.user;
-    const cart = await cartModel.findOne({ user: user._id });
+    const cart = await cartModel.findOne({ user: user.id });
     if (!cart) {
       return res.status(404).json({
         message: "Cart not found",
@@ -100,7 +106,7 @@ async function deleteProduct(req, res) {
 async function deleteCart(req,res) {
   try {
     const user = req.user;
-    const cart = await cartModel.findOneAndDelete({user:user._id});
+    const cart = await cartModel.findOneAndDelete({user:user.id});
     if(!cart){
       return res.status(404).json({
         message:"no cart found" 

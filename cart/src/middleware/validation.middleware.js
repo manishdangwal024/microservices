@@ -1,4 +1,4 @@
-const { body, validationResult } = require("express-validator");
+const { body, validationResult,param} = require("express-validator");
 const mongoose = require("mongoose");
 function cartValidationResult(req, res, next) {
   const error = validationResult(req);
@@ -25,7 +25,7 @@ const validationAddItemToCart = [
 ];
 
 const validateUpdateCartItem = [
-  params("productId")
+  param("productId")
     .isString()
     .withMessage("Product ID must be string")
     .custom((value) => mongoose.Types.ObjectId.isValid(value))
@@ -39,7 +39,7 @@ const validateUpdateCartItem = [
 ];
 
 const validateProductId=[
-  params("productId")
+  param("productId")
     .isString()
     .withMessage("Product ID must be string")
     .custom((value) => mongoose.Types.ObjectId.isValid(value))
